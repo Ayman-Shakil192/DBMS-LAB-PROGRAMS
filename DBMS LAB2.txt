@@ -1,0 +1,101 @@
+1) Add the required constraints on the created tables.
+
+CREATE TABLE SUPPLIER
+(
+	SID INT NOT NULL AUTO_INCREMENT,
+	SNAME VARCHAR(100),
+	ADDRESS VARCHAR(100),
+	PRIMARY KEY (SID)
+);
+
+CREATE TABLE PART
+(
+	PID INT NOT NULL AUTO_INCREMENT,
+	PNAME VARCHAR(100),
+	COLOR VARCHAR(100),
+	PRIMARY KEY (PID)
+);
+
+CREATE TABLE CATALOG
+(
+	SID INT,
+	PID INT,
+	COST REAL,
+	FOREIGN KEY (SID) REFERENCES SUPPLIER (SID) ON DELETE CASCADE,
+	FOREIGN KEY (PID) REFERENCES PART (PID) ON DELETE CASCADE
+);
+
+2) Populate the relations with at least 5 tuples each.
+
+INSERT INTO SUPPLIER(SNAME,ADDRESS) VALUES
+('RAHUL','BANGLORE'),
+('SHASHANK','DELHI'),
+('AJAY','MUMBAI'),
+('JESSICA','JAIPUR'),
+('ROHIT','BANGLORE');
+
+INSERT INTO PART(PNAME,COLOR) VALUES
+('PART1','GREEN'),
+('PART2','RED'),
+('PART3','BLUE'),
+('PART4','GREEN'),
+('PART5','RED');
+
+INSERT INTO CATALOG(SID,PID,COST) VALUES
+(1,1,4500),
+(2,2,3000),
+(3,3,5000),
+(4,4,8000),
+(5,5,10000);
+
+3) Select the ID and names of all the suppliers.
+
+SELECT SID,SNAME FROM SUPPLIER;
+
+4) Select the most costly part available in the catalog.
+
+SELECT SID,COST FROM CATALOG WHERE
+COST = (SELECT MAX(COST) FROM CATALOG);
+
+5) Find the pnames of parts for which there is some supplier.
+
+SELECT P.PNAME FROM PART P,SUPPLIER S,CATALOG C
+WHERE S.SID = P.PID AND C.SID = P.PID;
+
+6) Find the sids of suppliers who supply a red part and a green part.
+
+SELECT S.SID FROM SUPPLIER S,PART P,CATALOG C
+WHERE S.SID = P.PID AND C.SID = P.PID AND P.COLOR IN ('RED','GREEN');
+
+ADDITIONAL QUERIES
+
+1) Find the sids of suppliers who supply a red part or a green part.
+
+SELECT SUPPLIER.SID FROM SUPPLIER
+JOIN CATALOG
+ON SUPPLIER.SID = CATALOG.SID
+JOIN PART
+ON PART.PID = CATALOG.PID
+WHERE PART.COLOR IN ('RED','GREEN');
+
+2) List the suppliers residing in Bangalore.
+
+SELECT SID,SNAME FROM SUPPLIER WHERE ADDRESS = 'BANGLORE';
+
+3) Find the sids of suppliers who supply red parts
+
+SELECT SUPPLIER.SID,PART.COLOR FROM SUPPLIER
+JOIN CATALOG
+ON SUPPLIER.SID = CATALOG.SID
+JOIN PART
+ON PART.PID = CATALOG.PID
+WHERE PART.COLOR = 'RED';
+
+4) For every supplier that supplies a green part and a red part, print the name and price of the most expensive part that he/she supplies.
+
+SELECT S.SNAME,P.PNAME,P.COLOR,C.COST AS 'MAXIMUM COST' FROM SUPPLIER S,PART P,CATALOG C
+WHERE S.SID = C.SID AND P.PID = C.PID AND P.COLOR IN ('RED','GREEN') 
+ORDER BY C.COST DESC LIMIT 2;
+
+
+
